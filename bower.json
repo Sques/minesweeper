@@ -1,0 +1,21 @@
+{
+  "name": "sapper",
+  "authors": [
+    "Nikolaenko Andrey <sques.main.acc@gmail.com>"
+  ],
+  "description": "an attempt to write game Sapper with javaScript MVC",
+  "main": "",
+  "license": "MIT",
+  "homepage": "https://github.com/Sques/sapper.git",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.3"
+  }
+}
