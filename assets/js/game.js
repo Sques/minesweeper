@@ -78,7 +78,7 @@ var model = {
     fillStartPosition: function (position) {
 
         var
-            newPosition = '',
+            newPosition = [],
             pos = position.split(':');
 
         for (var i = -1; i <= 1; i++) {
@@ -89,11 +89,16 @@ var model = {
                     this.startPosition.push(position);
                 else{
 
+                    newPosition = [
+                        parseInt(pos[0]) + i,
+                        parseInt(pos[1]) + j
+                    ];
+
                     if (
-                        (pos[0] >= 0 && pos[1] >= 0) &&
-                        (pos[0] < this.fieldSize[0] && pos[1] < this.fieldSize[1])
+                        (newPosition[0] >= 0 && newPosition[1] >= 0) &&
+                        (newPosition[0] < this.fieldSize[0] && newPosition[1] < this.fieldSize[1])
                     ){
-                        newPosition = (parseInt(pos[0]) + i) + ':' + (parseInt(pos[1]) + j);
+                        newPosition = newPosition[0] + ':' + newPosition[1];
                         this.startPosition.push(newPosition);
                     }
                 }
@@ -551,8 +556,6 @@ var controller = {
             }).on('mouseup', 'td.closed', function (e) {
 
                 var $this = $(this);
-
-                console.log(lDown, rDown);
 
                 if (!lDown || !rDown) {
 
