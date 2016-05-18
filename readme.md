@@ -1,2 +1,2 @@
-# sapper / Сапер
-an attempt to write game "Sapper" with javaScript MVC + jQuery
+# minesweeper / Сапер
+an attempt to write game "minesweeper" with javaScript MVC + jQuery
