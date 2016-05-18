@@ -1,2 +1,2 @@
-# sapper / Ρΰοεπ
+# sapper / Π΅Π°ΠΏΠµΡ€
 an attempt to write game "Sapper" with javaScript MVC + jQuery
