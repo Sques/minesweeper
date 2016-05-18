@@ -63,6 +63,12 @@ var view = {
 
         $('input#flag_cnt').val(i);
 
+    },
+
+    changeGameTime: function (i) {
+
+        $('input#game_time').val(i);
+
     }
 
 };
@@ -71,6 +77,16 @@ var model = {
 
     fieldSize: [15, 30],
     minesNum: 40,
+
+    minMinePercent : 8,
+    maxMinePercent : 20,
+
+    minHSize : 10,
+    maxHSize : 50,
+
+    minVSize : 5,
+    maxVSize : 25,
+
     startPosition: [],
     fieldsObj: [],
 
@@ -431,18 +447,16 @@ var model = {
             vSize = parseInt($form.find('input[name="v_size"]').val()),
             mineCnt = parseInt($form.find('input[name="mine_cnt"]').val());
 
-        console.log(hSize, vSize, mineCnt);
+        if (hSize < this.minHSize || hSize > this.maxHSize)
+            return 'Размер поля по вертикале не должен быть меньше ' + this.minHSize + ' и не больше ' + this.maxHSize;
 
-        if (hSize < 10 || hSize > 40)
-            return 'Размер поля по вертикале не должен быть меньше 10 и не больше 40';
-
-        if (vSize < 10 || vSize > 20)
-            return 'Размер поля по горизонтали не должен быть меньше 10 и не больше 20';
+        if (vSize < this.minVSize || vSize > this.maxVSize)
+            return 'Размер поля по горизонтали не должен быть меньше ' + this.minVSize + ' и не больше ' + this.maxVSize;
 
         var
             fieldSquare = hSize*vSize,
-            minMineCtn = Math.ceil(fieldSquare*8/100),
-            maxMineCtn = Math.ceil(fieldSquare*20/100);
+            minMineCtn = Math.ceil(fieldSquare*this.minMinePercent/100),
+            maxMineCtn = Math.ceil(fieldSquare*this.maxMinePercent/100);
 
         if (mineCnt < minMineCtn || mineCnt > maxMineCtn)
             return 'При размере поля ' + hSize + ':' + vSize + ', количество мин должно быть в диапазоне от ' + minMineCtn + ' до ' + maxMineCtn;
@@ -460,35 +474,25 @@ var controller = {
 
     firstClick : true,
     flagCnt : 0,
-    gameCnt : 0,
+    gameTime : 0,
+    gameInterval : {},
 
     createField: function () {
         view.createField();
-    },
-
-    newGame: function ($this) {
-
-        $this = $this || $resetGame;
-
-        var gameOptions = model.gameOptions($this);
-
-        if (gameOptions)
-            alert(gameOptions);
-        else {
-            $field.html('');
-            this.firstClick = true;
-            this.createField();
-            model.fieldsObj = [];
-        }
-
     },
 
     openCell: function ($this) {
 
         var position = model.getPosition($this);
 
-        if (this.firstClick)
+        if (this.firstClick) {
             model.generateField(position);
+
+            this.gameInterval = setInterval(function (){
+                controller.gameTime++;
+                view.changeGameTime(controller.gameTime);
+            }, 1000);
+        }
 
         if (model.checkCell(position)) {
 
@@ -519,8 +523,10 @@ var controller = {
 
                 model.showField();
 
+                clearInterval(this.gameInterval);
+
                 setTimeout(function(){
-                    if (confirm("Вы выиграли. Сыграем еще?"))
+                    if (confirm('Вы выиграли. Ваше время: ' + controller.gameTime + ' сек. Сыграем еще?'))
                         controller.newGame();
                 }, 500);
 
@@ -530,21 +536,46 @@ var controller = {
 
     },
 
+    newGame: function ($this) {
+
+        $this = $this || $resetGame;
+
+        var gameOptions = model.gameOptions($this);
+
+        if (gameOptions)
+            alert(gameOptions);
+        else {
+            $field.html('');
+            this.firstClick = true;
+
+            this.flagCnt = 0;
+            view.changeFlagCnt(this.flagCnt);
+
+            clearInterval(this.gameInterval);
+            this.gameTime = 0;
+            view.changeGameTime(this.gameTime);
+
+            this.createField();
+            model.fieldsObj = [];
+        }
+
+    },
+
     toggleFlag: function ($this) {
 
         if ($this.hasClass('flag')) {
 
             --this.flagCnt;
-            view.changeFlagCnt(this.flagCnt);
             view.removeFlag($this);
 
         } else {
 
             ++this.flagCnt;
-            view.changeFlagCnt(this.flagCnt);
             view.showFlag($this);
 
         }
+
+        view.changeFlagCnt(this.flagCnt);
 
     },
 
