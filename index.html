@@ -12,17 +12,27 @@
     <form class="information-block clear-fix" action="">
         <div class="game-settings-block">
             <label for="h_size">Кол-во клеток по горизонтали: </label>
-            <input id="h_size" type="text" name="h_size" value="30" disabled />
+            <input id="h_size" type="text" name="h_size" value="30" />
         </div>
         <div class="game-settings-block">
             <label for="v_size">Кол-во клеток по вертикали: </label>
-            <input id="v_size" type="text" name="v_size" value="15" disabled />
+            <input id="v_size" type="text" name="v_size" value="15" />
         </div>
         <div class="game-settings-block">
             <label for="bomb_cnt">Кол-во бомб: </label>
-            <input id="bomb_cnt" type="text" name="bomb_cnt" value="40" disabled />
+            <input id="bomb_cnt" type="text" name="mine_cnt" value="40" />
         </div>
         <button type="button" class="btn btn-primary btn-reset" id="resetGame">Начать заного</button>
+    </form>
+    <form class="information-block clear-fix" action="">
+        <div class="game-settings-block">
+            <label for="flag_cnt">Кол-во флажков в игре: </label>
+            <input id="flag_cnt" type="text" name="flag_cnt" value="0" disabled />
+        </div>
+        <div class="game-settings-block">
+            <label for="game_time">Время игры: </label>
+            <input id="game_time" type="text" name="game_time" value="0" disabled />
+        </div>
     </form>
     <table id="gameFieldJS" class="table game-field"></table>
 </div>

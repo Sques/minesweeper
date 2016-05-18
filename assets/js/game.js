@@ -1,4 +1,6 @@
-var $field = $('#gameFieldJS');
+var
+    $field = $('#gameFieldJS'),
+    $resetGame = $('button#resetGame');
 
 var view = {
 
@@ -54,6 +56,12 @@ var view = {
             $cell.addClass('highLight');
         else
             $cell.removeClass('highLight');
+
+    },
+
+    changeFlagCnt: function (i) {
+
+        $('input#flag_cnt').val(i);
 
     }
 
@@ -413,6 +421,37 @@ var model = {
 
         }
 
+    },
+
+    gameOptions: function ($this) {
+
+        var
+            $form = $this.closest('form'),
+            hSize = parseInt($form.find('input[name="h_size"]').val()),
+            vSize = parseInt($form.find('input[name="v_size"]').val()),
+            mineCnt = parseInt($form.find('input[name="mine_cnt"]').val());
+
+        console.log(hSize, vSize, mineCnt);
+
+        if (hSize < 10 || hSize > 40)
+            return 'Размер поля по вертикале не должен быть меньше 10 и не больше 40';
+
+        if (vSize < 10 || vSize > 20)
+            return 'Размер поля по горизонтали не должен быть меньше 10 и не больше 20';
+
+        var
+            fieldSquare = hSize*vSize,
+            minMineCtn = Math.ceil(fieldSquare*8/100),
+            maxMineCtn = Math.ceil(fieldSquare*20/100);
+
+        if (mineCnt < minMineCtn || mineCnt > maxMineCtn)
+            return 'При размере поля ' + hSize + ':' + vSize + ', количество мин должно быть в диапазоне от ' + minMineCtn + ' до ' + maxMineCtn;
+
+        this.fieldSize = [vSize, hSize];
+        this.minesNum = mineCnt;
+
+        return false;
+
     }
 
 };
@@ -420,16 +459,28 @@ var model = {
 var controller = {
 
     firstClick : true,
+    flagCnt : 0,
+    gameCnt : 0,
 
     createField: function () {
         view.createField();
     },
 
-    newGame: function () {
-        $field.html('');
-        this.firstClick = true;
-        this.createField();
-        model.fieldsObj = [];
+    newGame: function ($this) {
+
+        $this = $this || $resetGame;
+
+        var gameOptions = model.gameOptions($this);
+
+        if (gameOptions)
+            alert(gameOptions);
+        else {
+            $field.html('');
+            this.firstClick = true;
+            this.createField();
+            model.fieldsObj = [];
+        }
+
     },
 
     openCell: function ($this) {
@@ -481,10 +532,19 @@ var controller = {
 
     toggleFlag: function ($this) {
 
-        if ($this.hasClass('flag'))
+        if ($this.hasClass('flag')) {
+
+            --this.flagCnt;
+            view.changeFlagCnt(this.flagCnt);
             view.removeFlag($this);
-        else
+
+        } else {
+
+            ++this.flagCnt;
+            view.changeFlagCnt(this.flagCnt);
             view.showFlag($this);
+
+        }
 
     },
 
@@ -589,8 +649,8 @@ var controller = {
 
             });
 
-            $('button#resetGame').on('click', function (){
-                controller.newGame();
+            $resetGame.on('click', function (){
+                controller.newGame($(this));
                 return false;
             });
 
