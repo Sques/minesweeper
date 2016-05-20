@@ -39,15 +39,21 @@ var view = {
     },
 
     showMine: function ($cell) {
+
         $cell.removeClass('closed flag').addClass('mine');
+
     },
 
     showFlag: function ($cell) {
+
         $cell.addClass('flag');
+
     },
 
     removeFlag: function ($cell) {
+
         $cell.removeClass('flag');
+
     },
 
     toggleHighLight: function ($cell, toggle) {
@@ -89,15 +95,7 @@ var model = {
 
     startPosition: [],
     fieldsObj: [],
-
-    generateField: function (position){
-
-        this.fillStartPosition(position);
-        this.createMines();
-        this.setFields();
-        controller.firstClick = false;
-
-    },
+    openCellCnt : 0,
 
     fillStartPosition: function (position) {
 
@@ -277,10 +275,13 @@ var model = {
 
     openNeighbor: function (position, clearCell) {
 
+        clearCell = clearCell || [];
+
         if(($.inArray(position, clearCell) == -1) && (!this.fieldsObj[position].isOpen)){
 
             clearCell.push(position);
             this.fieldsObj[position].isOpen = true;
+            ++this.openCellCnt;
 
             var pos = position.split(':');
 
@@ -309,10 +310,13 @@ var model = {
                                     isMine = this.fieldsObj[newPosition].isMine;
 
                                 view.showCell($cell, mineNear);
+
                                 if(mineNear == 0)
                                     this.openNeighbor(newPosition, clearCell);
-                                else if (mineNear > 0 && (!this.fieldsObj[newPosition].isOpen))
+                                else if (mineNear > 0) {
                                     this.fieldsObj[newPosition].isOpen = true;
+                                    ++this.openCellCnt;
+                                }
 
                             }
 
@@ -408,17 +412,10 @@ var model = {
     gameStatus: function () {
 
         var
-            notOpenCell = 0;
+            fieldSize = this.fieldSize[0] * this.fieldSize[1],
+            openCellCnt = fieldSize - this.minesNum;
 
-        for ( var key in this.fieldsObj) {
-
-            if (!this.fieldsObj[key].isOpen) {
-                ++notOpenCell;
-            }
-
-        }
-
-        return (notOpenCell <= this.minesNum) ? true : false;
+        return (this.openCellCnt >= openCellCnt) ? true : false;
 
     },
 
@@ -481,12 +478,21 @@ var controller = {
         view.createField();
     },
 
+    generateField: function (position){
+
+        model.fillStartPosition(position);
+        model.createMines();
+        model.setFields();
+        this.firstClick = false;
+
+    },
+
     openCell: function ($this) {
 
         var position = model.getPosition($this);
 
         if (this.firstClick) {
-            model.generateField(position);
+            this.generateField(position);
 
             this.gameInterval = setInterval(function (){
                 controller.gameTime++;
@@ -513,10 +519,11 @@ var controller = {
             if (mineNear > 0) {
                 view.showCell($this, mineNear);
                 model.fieldsObj[position].isOpen = true;
+                ++model.openCellCnt;
             }
             else if (mineNear == 0) {
                 view.showCell($this, false);
-                model.openNeighbor(position, []);
+                model.openNeighbor(position);
             }
 
             if (model.gameStatus()) {
@@ -545,6 +552,7 @@ var controller = {
         if (gameOptions)
             alert(gameOptions);
         else {
+
             $field.html('');
             this.firstClick = true;
 
@@ -557,6 +565,8 @@ var controller = {
 
             this.createField();
             model.fieldsObj = [];
+            model.openCellCnt = 0;
+
         }
 
     },
@@ -600,7 +610,8 @@ var controller = {
     backLight: function ($this, toggle) {
 
         // есть баги с кликами...
-        var position = model.getPosition($this),
+        var
+            position = model.getPosition($this),
             cellObj = model.getCellToOpen(position);
 
         for (var key in cellObj)
