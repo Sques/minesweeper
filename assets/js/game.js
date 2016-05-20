@@ -4,10 +4,12 @@ var
 
 var view = {
 
+    pxTableWidth : 1200,
+
     createField: function(){
 
         var
-            size = ( 1200 / model.fieldSize[1] ).toFixed(6) + 'px',
+            size = ( this.pxTableWidth / model.fieldSize[1] ).toFixed(6) + 'px',
             tableLine = '';
 
         tableLine = '<tbody>';
@@ -85,7 +87,7 @@ var model = {
     minesNum: 40,
 
     minMinePercent : 8,
-    maxMinePercent : 20,
+    maxMinePercent : 16,
 
     minHSize : 10,
     maxHSize : 50,
@@ -273,6 +275,11 @@ var model = {
 
     },
 
+    markPosition: function (position) {
+        this.fieldsObj[position].isOpen = true;
+        ++this.openCellCnt;
+    },
+
     openNeighbor: function (position, clearCell) {
 
         clearCell = clearCell || [];
@@ -280,8 +287,7 @@ var model = {
         if(($.inArray(position, clearCell) == -1) && (!this.fieldsObj[position].isOpen)){
 
             clearCell.push(position);
-            this.fieldsObj[position].isOpen = true;
-            ++this.openCellCnt;
+            this.markPosition(position);
 
             var pos = position.split(':');
 
@@ -313,10 +319,8 @@ var model = {
 
                                 if(mineNear == 0)
                                     this.openNeighbor(newPosition, clearCell);
-                                else if (mineNear > 0) {
-                                    this.fieldsObj[newPosition].isOpen = true;
-                                    ++this.openCellCnt;
-                                }
+                                else if (mineNear > 0)
+                                    this.markPosition(newPosition);
 
                             }
 
@@ -518,13 +522,14 @@ var controller = {
 
             if (mineNear > 0) {
                 view.showCell($this, mineNear);
-                model.fieldsObj[position].isOpen = true;
-                ++model.openCellCnt;
+                model.markPosition(position);
             }
             else if (mineNear == 0) {
                 view.showCell($this, false);
                 model.openNeighbor(position);
             }
+
+            console.log(model.openCellCnt);
 
             if (model.gameStatus()) {
 
