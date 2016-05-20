@@ -4,7 +4,7 @@ var
 
 var view = {
 
-    pxTableWidth : 1200,
+    pxTableWidth: 1200,
 
     createField: function(){
 
@@ -86,14 +86,14 @@ var model = {
     fieldSize: [15, 30],
     minesNum: 40,
 
-    minMinePercent : 8,
-    maxMinePercent : 16,
+    minMinePercent: 8,
+    maxMinePercent: 16,
 
-    minHSize : 10,
-    maxHSize : 50,
+    minHSize: 10,
+    maxHSize: 50,
 
-    minVSize : 5,
-    maxVSize : 25,
+    minVSize: 5,
+    maxVSize: 25,
 
     startPosition: [],
     fieldsObj: [],
@@ -448,11 +448,18 @@ var model = {
             vSize = parseInt($form.find('input[name="v_size"]').val()),
             mineCnt = parseInt($form.find('input[name="mine_cnt"]').val());
 
-        if (hSize < this.minHSize || hSize > this.maxHSize)
-            return 'Размер поля по вертикале не должен быть меньше ' + this.minHSize + ' и не больше ' + this.maxHSize;
+        if (!vSize)
+            return 'Необходимо указать число в поле "Кол-во клеток по вертикали"';
+        else if (vSize < this.minVSize || vSize > this.maxVSize)
+            return 'Размер поля по вертикали не должен быть меньше ' + this.minVSize + ' и не больше ' + this.maxVSize;
 
-        if (vSize < this.minVSize || vSize > this.maxVSize)
-            return 'Размер поля по горизонтали не должен быть меньше ' + this.minVSize + ' и не больше ' + this.maxVSize;
+        if (!hSize)
+            return 'Необходимо указать число в поле "Кол-во клеток по горизонтали"';
+        else if (hSize < this.minHSize || hSize > this.maxHSize)
+            return 'Размер поля по горизонтали не должен быть меньше ' + this.minHSize + ' и не больше ' + this.maxHSize;
+
+        if (!mineCnt)
+            return 'Необходимо указать число в поле "Кол-во бомб"';
 
         var
             fieldSquare = hSize*vSize,
@@ -460,7 +467,7 @@ var model = {
             maxMineCtn = Math.ceil(fieldSquare*this.maxMinePercent/100);
 
         if (mineCnt < minMineCtn || mineCnt > maxMineCtn)
-            return 'При размере поля ' + hSize + ':' + vSize + ', количество мин должно быть в диапазоне от ' + minMineCtn + ' до ' + maxMineCtn;
+            return 'При размере поля ' + hSize + ' на ' + vSize + ', количество мин должно быть в диапазоне от ' + minMineCtn + ' до ' + maxMineCtn;
 
         this.fieldSize = [vSize, hSize];
         this.minesNum = mineCnt;
@@ -473,10 +480,10 @@ var model = {
 
 var controller = {
 
-    firstClick : true,
-    flagCnt : 0,
-    gameTime : 0,
-    gameInterval : {},
+    firstClick: true,
+    flagCnt: 0,
+    gameTime: 0,
+    gameInterval: {},
 
     createField: function () {
         view.createField();
@@ -528,8 +535,6 @@ var controller = {
                 view.showCell($this, false);
                 model.openNeighbor(position);
             }
-
-            console.log(model.openCellCnt);
 
             if (model.gameStatus()) {
 
